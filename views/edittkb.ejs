@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <%- include('./partials/libs.ejs') %>
+</head>
+
+<body>
+    
+
+
+    <div id="app" class="container">
+        <h1>
+            <%= title %>
+        </h1>
+        <a class="btn btn-primary" href="../">Về trang chủ</a>
+        <br>
+        <label for="username">
+            Chọn ngày
+        </label>
+        <select class="form-select" aria-label="Chọn thu" v-model="dayid" v-on:change="getday">
+            <option v-for="day in listday " :key="day.id" :value="day.id">
+                {{ day.value }}
+            </option>
+        </select>
+        <div v-if="dataSource?true:false">
+            <table class="table">
+                <tr>
+                    <th><h4>{{dataSource.dayname}}</h4></th>
+                </tr>
+                <tr>
+                    <td>
+                        <select class="form-select" aria-label="Chọn môn" v-model="dataSource.subject[0]">
+                            <option v-for="subj in listsubj" :key="subj.id" :value="subj.id">
+                                {{ listsubj[subj.id].value }}
+                            </option>
+                        </select>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <select class="form-select" aria-label="Chọn môn" v-model="dataSource.subject[1]">
+                            <option v-for="subj in listsubj" :key="subj.id" :value="subj.id">
+                                {{ listsubj[subj.id].value }}
+                            </option>
+                        </select>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <select class="form-select" aria-label="Chọn môn" v-model="dataSource.subject[2]">
+                            <option v-for="subj in listsubj" :key="subj.id" :value="subj.id">
+                                {{ listsubj[subj.id].value }}
+                            </option>
+                        </select>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <select class="form-select" aria-label="Chọn môn" v-model="dataSource.subject[3]">
+                            <option v-for="subj in listsubj" :key="subj.id" :value="subj.id">
+                                {{ listsubj[subj.id].value }}
+                            </option>
+                        </select>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <select class="form-select" aria-label="Chọn môn" v-model="dataSource.subject[4]">
+                            <option v-for="subj in listsubj" :key="subj.id" :value="subj.id">
+                                {{ listsubj[subj.id].value }}
+                            </option>
+                        </select>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <select class="form-select" aria-label="Chọn môn" v-model="dataSource.subject[5]">
+                            <option v-for="subj in listsubj" :key="subj.id" :value="subj.id">
+                                {{ listsubj[subj.id].value }}
+                            </option>
+                        </select>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <select class="form-select" aria-label="Chọn môn" v-model="dataSource.subject[6]">
+                            <option v-for="subj in listsubj" :key="subj.id" :value="subj.id">
+                                {{ listsubj[subj.id].value }}
+                            </option>
+                        </select>
+                    </td>
+                    
+                </tr>
+            </table>
+            <button class="btn btn-danger" type="button" v-on:click="updateday">Update</button>
+        </div>
+        
+
+    </div>
+
+
+    <script>
+        const API_PATH = "<%= process.env.API_PATH %>";
+        const ALL_SUBJS = <%- JSON.stringify(SUBJECT) %>;
+        const ALL_DAYS = <%- JSON.stringify(DAY) %>;
+        var app = new Vue({
+            el: '#app',
+            data: {
+                message: 'Vue is working!',
+                subj: [],
+                listsubj: ALL_SUBJS,
+                listday: ALL_DAYS,
+                dataSource: null,
+                dayid: null,
+            },
+
+            methods: {
+                async getday() {
+                    try{
+                    const response = await axios.get(API_PATH+'get/day', {
+                        params: {
+                            id: this.dayid
+                        }
+                    });
+                    this.dataSource = response.data;
+                    }catch(e){
+                        console.log(e);
+                    }
+                },
+                async updateday() {
+                    try {
+                        const response = await axios.post(API_PATH+'update/day', {
+                            ...this.dataSource,
+                            subject: this.dataSource.subject.map(e => Number(e))
+                        });
+                        alert('Update thành công');
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

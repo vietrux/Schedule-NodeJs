@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <%- include('./partials/libs.ejs') %>
+    
+</head>
+
+<body>
+    
+
+
+    <div id="app" class="container">
+        <h1>
+            <%= title %>
+        </h1>
+        <a class="btn btn-primary" href="../">Về trang chủ</a>
+        <br>
+        <label for="username">
+            Chọn môn
+        </label>
+        <select class="form-select" aria-label="Chọn thu" v-model="subjectid" v-on:change="gettask">
+            <option v-for="subject in listsubject " :key="subject.id" :value="subject.id">
+                {{ subject.value }}
+            </option>
+        </select>
+
+        
+        
+        <div v-if="dataSource?true:false">
+            <form>
+                <span>Nhập nội dung</span>
+                <input class="form-control" v-model="formData.task" />
+                <button class="btn btn-secondary" type="button" v-on:click="addtask">Thêm</button>
+            </form>
+            <table class="table">
+                <tr>
+                    <th>Môn</th>
+                    <th>Nội dung</th>
+                    <th>Hành động</th>
+                </tr>
+                <tr v-for="task in dataSource">
+                    <td>{{listsubject[task.subject].value}}</td>
+                    <td>{{task.task}}</td>
+                    <td><a class="btn btn-danger" v-on:click="deletetask(task._id)">Xóa</a></td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+
+    <script>
+        const API_PATH = "<%= process.env.API_PATH %>";
+        const ALL_SUBJS = <%- JSON.stringify(SUBJECT) %>;
+        var app = new Vue({
+            el: '#app',
+            data: {
+                message: 'Vue is working!',
+                subj: [],
+                listsubject: ALL_SUBJS,
+                dataSource: null,
+                formData: {
+                    subject: null,
+                    task: null,
+                },
+                subjectid: null,
+            },
+
+            methods: {
+                //get all task 
+                async gettask(){
+                    try {
+                        const response = await axios.get('/api/get/taskbysubj', {
+                            params: {
+                                subject: this.subjectid
+                            }
+                        });
+                        this.dataSource = response.data;    
+                    } catch (e) {
+                        console.log(e);
+                    }
+                },
+                //delete task
+                async deletetask(id){
+                    try {
+                        const response = await axios.get('/api/delete/task', {
+                            params: {
+                                _id: id
+                            }
+                        });
+                        alert('Xóa thành công');
+                    } catch (e) {
+                        console.log(e);
+                    }
+                },
+                //add task
+                async addtask(){
+                    try {
+                        const response = await axios.post('/api/add/task', {
+                            subject: this.subjectid,
+                            task: this.formData.task
+                        });
+                        alert('Thêm thành công');
+                    } catch (e) {
+                        console.log(e);
+                    }
+                },
+                }
+            });
+    </script>
+</body>
+
+</html>

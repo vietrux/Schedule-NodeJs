@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= title %>
+  </title>
+  <%- include('./partials/libs.ejs') %>
+</head>
+
+<body>
+
+
+  <div id="app">
+
+    <div class="container" v-if="listtask?true:false">
+      <h1>
+        <%= title %>
+      </h1>
+      <div class="row">
+        <div class="col">
+          <a class="btn btn-primary" href="./edittkb">Sửa tkb</a>
+          <table class="table">
+            <tr>
+              <th>{{tkb.dayname}}</th>
+            </tr>
+            <tr v-for="subj in listsubjtoday">
+              <td>{{ listsubj[ subj ].value }}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="col">
+          <a class="btn btn-primary" href="./edittask">Sửa nvụ</a>
+          <table class="table">
+            <tr>
+              <th>Nhiệm vụ</th>
+            </tr>
+            <tr v-for="task in listtask">
+              <td>
+                <div>
+                  {{ listsubj[ task.subject ].value + ' - ' +task.task }}
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    
+
+  </div>
+
+
+  <script>
+    const API_PATH = "<%= process.env.API_PATH %>";
+    const ALL_SUBJS = <%- JSON.stringify(SUBJECT) %>;
+    const ALL_DAYS = <%- JSON.stringify(DAY) %>;
+    const d = new Date();
+    const DAY = d.getDay();
+    var app = new Vue({
+      el: '#app',
+      data: {
+        listsubj: ALL_SUBJS,
+        listday: ALL_DAYS,
+        message: 'Vue is working!',
+        tkb: null,
+        listsubjtoday: [],
+        listtask: null,
+        dayid: DAY,
+      },
+      async created() {
+        await this.getDay();
+        await this.getTask();
+      },
+      methods: {
+        async getDay() {
+          if (this.dayid == 6) {
+            this.message = "Nghỉ thôi bạn ơi";
+          }
+          try {
+            const response = await axios.get(API_PATH+'get/day', {
+              params: {
+                id: this.dayid
+              }
+            });
+            this.tkb = response.data;
+            this.listsubjtoday = this.tkb.subject;
+            //remove same value in array javascript
+            this.tkb.subject = this.tkb.subject.filter(function (item, pos) {
+              return this.indexOf(item) == pos;
+            }, this.tkb.subject);
+            console.log(this.tkb.subject);
+            console.log(this.listsubjtoday)
+
+          } catch (e) {
+            console.log(e);
+          }
+        },
+        async getTask() {
+          try {
+            const response = await axios.get('/api/get/taskbysubj', {
+              params: {
+                subject: this.tkb.subject
+              }
+            });
+            this.listtask = response.data;
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
