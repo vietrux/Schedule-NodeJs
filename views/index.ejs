@@ -9,20 +9,25 @@
     <%= title %>
   </title>
   <%- include('./partials/libs.ejs') %>
+  <style>
+    .done {
+      text-decoration: line-through;
+    }
+  </style>
 </head>
 
 <body>
 
 
-  <div id="app">
+  <div id="app" class="container" v-if="listtask?true:false">
 
-    <div class="container" v-if="listtask?true:false">
-      <h1>
+    <%- include('./partials/navbar.ejs') %>
+      <h1 style="padding-top: 30px;">
         <%= title %>
       </h1>
-      <div class="row">
-        <div class="col">
-          <a class="btn btn-primary" href="./edittkb">Sửa tkb</a>
+      <div class="row" >
+        <div class="col card ">
+
           <table class="table">
             <tr>
               <th>{{tkb.dayname}}</th>
@@ -32,26 +37,26 @@
             </tr>
           </table>
         </div>
-        <div class="col">
-          <a class="btn btn-primary" href="./edittask">Sửa nvụ</a>
+        <div class="col card ">
+
           <table class="table">
             <tr>
               <th>Nhiệm vụ</th>
             </tr>
-            <tr v-for="task in listtask">
+            <tr v-for="(task,index) in listtask">
               <td>
-                <div>
-                  {{ listsubj[ task.subject ].value + ' - ' +task.task }}
+                <div class="text-break" v-bind="{id: 'div'+index}">
+                  {{ listsubj[ task.subject ].value + ' - ' +task.task }}	&nbsp;<a role="button" class="link-danger" v-on:click="done(index)">Xong</a>
                 </div>
               </td>
+              <td>
+                <a v-bind="{id: 'a'+index}" role="button" class="link-danger" v-on:click="deletetask(task._id)" hidden>Xóa</a>
+              </td>
             </tr>
+            
           </table>
         </div>
       </div>
-    </div>
-    
-    
-
   </div>
 
 
@@ -77,12 +82,19 @@
         await this.getTask();
       },
       methods: {
+        //done 
+        done: function (id) {
+          var div = document.getElementById('div'+id);
+          div.classList.toggle("done");
+          var a = document.getElementById('a'+id);
+          a.removeAttribute("hidden"); 
+        },
         async getDay() {
           if (this.dayid == 6) {
             this.message = "Nghỉ thôi bạn ơi";
           }
           try {
-            const response = await axios.get(API_PATH+'get/day', {
+            const response = await axios.get(API_PATH + 'get/day', {
               params: {
                 id: this.dayid
               }
@@ -93,16 +105,13 @@
             this.tkb.subject = this.tkb.subject.filter(function (item, pos) {
               return this.indexOf(item) == pos;
             }, this.tkb.subject);
-            console.log(this.tkb.subject);
-            console.log(this.listsubjtoday)
-
           } catch (e) {
             console.log(e);
           }
         },
         async getTask() {
           try {
-            const response = await axios.get('/api/get/taskbysubj', {
+            const response = await axios.get(API_PATH + 'get/taskbysubj', {
               params: {
                 subject: this.tkb.subject
               }
@@ -111,7 +120,19 @@
           } catch (e) {
             console.log(e);
           }
-        }
+        },
+        async deletetask(id) {
+          try {
+            const response = await axios.get(API_PATH + 'delete/task', {
+              params: {
+                _id: id
+              }
+            });
+            this.getTask();
+          } catch (e) {
+            console.log(e);
+          }
+        },
       }
     });
   </script>

@@ -13,13 +13,14 @@
 
 <body>
     
+    
 
-
-    <div id="app" class="container">
-        <h1>
-            <%= title %>
+    <div id="app" class="container" >
+        <%- include('./partials/navbar.ejs') %>
+        <h1 style="padding-top: 30px;">
+            <%= title %> &nbsp; <a class="btn btn-primary" href="../">Về trang chủ</a>
         </h1>
-        <a class="btn btn-primary" href="../">Về trang chủ</a>
+        
         <br>
         <label for="username">
             Chọn ngày
@@ -29,6 +30,7 @@
                 {{ day.value }}
             </option>
         </select>
+        <br>
         <div v-if="dataSource?true:false">
             <table class="table">
                 <tr>
@@ -105,7 +107,10 @@
                     
                 </tr>
             </table>
-            <button class="btn btn-danger" type="button" v-on:click="updateday">Update</button>
+            <button class="btn btn-danger" type="button" v-on:click="updateday">Update</button><br><br>
+            <div v-if="signal?true:false" class="alert alert-primary" role="alert">
+                {{signal}}
+              </div>
         </div>
         
 
@@ -125,28 +130,36 @@
                 listday: ALL_DAYS,
                 dataSource: null,
                 dayid: null,
+                signal: null
             },
 
             methods: {
+                //scroll to bottom
+                async scroll(){
+                    await this.$nextTick();
+                    window.scrollTo(0, document.body.scrollHeight);
+                },
                 async getday() {
                     try{
-                    const response = await axios.get(API_PATH+'get/day', {
+                    const response = await axios.get(API_PATH + 'get/day', {
                         params: {
                             id: this.dayid
                         }
                     });
                     this.dataSource = response.data;
+                    this.signal = null;
                     }catch(e){
                         console.log(e);
                     }
                 },
                 async updateday() {
                     try {
-                        const response = await axios.post(API_PATH+'update/day', {
+                        const response = await axios.post(API_PATH + 'update/day', {
                             ...this.dataSource,
                             subject: this.dataSource.subject.map(e => Number(e))
                         });
-                        alert('Update thành công');
+                        this.signal = "Đã cập nhật";
+                        this.scroll();
                     } catch (e) {
                         console.log(e);
                     }

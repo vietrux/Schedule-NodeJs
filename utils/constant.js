@@ -62,6 +62,30 @@ const CONSTANT = {
         },
         {
             "id": 15,
+            "value": "Buổi chiều-Toán"
+        },
+        {
+            "id": 16,
+            "value": "Buổi chiều-Vật lý"
+        },
+        {
+            "id": 17,
+            "value": "Buổi chiều-Hóa học"
+        },
+        {
+            "id": 18,
+            "value": "Buổi chiều-Sinh học"
+        },
+        {
+            "id": 19,
+            "value": "Buổi chiều-Ngữ Văn"
+        },
+        {
+            "id": 20,
+            "value": "Buổi chiều-Tiếng Anh"
+        },
+        {
+            "id": 21,
             "value": "Nghỉ"
         }
     ],

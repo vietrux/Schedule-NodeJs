@@ -17,10 +17,11 @@
 
 
     <div id="app" class="container">
-        <h1>
-            <%= title %>
+        <%- include('./partials/navbar.ejs') %>
+        <h1 style="padding-top: 30px;">
+            <%= title %>&nbsp; <a class="btn btn-primary" href="../">Về trang chủ</a>
         </h1>
-        <a class="btn btn-primary" href="../">Về trang chủ</a>
+        
         <br>
         <label for="username">
             Chọn môn
@@ -30,15 +31,9 @@
                 {{ subject.value }}
             </option>
         </select>
-
-        
-        
-        <div v-if="dataSource?true:false">
-            <form>
-                <span>Nhập nội dung</span>
-                <input class="form-control" v-model="formData.task" />
-                <button class="btn btn-secondary" type="button" v-on:click="addtask">Thêm</button>
-            </form>
+        <br>
+        <div v-if="dataSource?true:false" >
+            
             <table class="table">
                 <tr>
                     <th>Môn</th>
@@ -47,10 +42,15 @@
                 </tr>
                 <tr v-for="task in dataSource">
                     <td>{{listsubject[task.subject].value}}</td>
-                    <td>{{task.task}}</td>
+                    <td class="text-break">{{task.task}}</td>
                     <td><a class="btn btn-danger" v-on:click="deletetask(task._id)">Xóa</a></td>
                 </tr>
-            </table>
+            </table><form>
+                <span>Nhập nội dung</span>
+                <input class="form-control" v-model="formData.task" /><br>
+                <button class="btn btn-secondary" type="button" v-on:click="addtask">Thêm</button>
+            </form>
+
         </div>
 
     </div>
@@ -77,7 +77,7 @@
                 //get all task 
                 async gettask(){
                     try {
-                        const response = await axios.get('/api/get/taskbysubj', {
+                        const response = await axios.get(API_PATH + 'get/taskbysubj', {
                             params: {
                                 subject: this.subjectid
                             }
@@ -90,12 +90,12 @@
                 //delete task
                 async deletetask(id){
                     try {
-                        const response = await axios.get('/api/delete/task', {
+                        const response = await axios.get(API_PATH + 'delete/task', {
                             params: {
                                 _id: id
                             }
                         });
-                        alert('Xóa thành công');
+                        this.gettask();
                     } catch (e) {
                         console.log(e);
                     }
@@ -103,11 +103,11 @@
                 //add task
                 async addtask(){
                     try {
-                        const response = await axios.post('/api/add/task', {
+                        const response = await axios.post(API_PATH + 'add/task', {
                             subject: this.subjectid,
                             task: this.formData.task
                         });
-                        alert('Thêm thành công');
+                        this.gettask();
                     } catch (e) {
                         console.log(e);
                     }
